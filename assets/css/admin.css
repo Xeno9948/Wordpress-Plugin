@@ -1,0 +1,220 @@
+/**
+ * Kiyoh Widget Admin Styles
+ */
+
+.kiyoh-admin-wrap {
+    max-width: 1200px;
+}
+
+.kiyoh-admin-wrap h1 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.kiyoh-admin-container {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.kiyoh-admin-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.kiyoh-admin-sidebar {
+    width: 350px;
+    flex-shrink: 0;
+}
+
+.kiyoh-admin-section {
+    background: #fff;
+    padding: 20px 25px;
+    margin-bottom: 20px;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.kiyoh-admin-section h2 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 1.3em;
+}
+
+.kiyoh-admin-section .description {
+    color: #666;
+    font-style: italic;
+    margin-bottom: 15px;
+}
+
+.kiyoh-admin-section .form-table th {
+    width: 180px;
+    padding-left: 0;
+}
+
+.kiyoh-admin-section .form-table td label {
+    margin-right: 15px;
+}
+
+.kiyoh-admin-box {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.kiyoh-admin-box h3 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    color: #23282d;
+}
+
+.kiyoh-admin-box h4 {
+    margin-bottom: 5px;
+    margin-top: 15px;
+}
+
+.kiyoh-admin-box code {
+    display: block;
+    padding: 10px 15px;
+    background: #f6f7f7;
+    border-radius: 3px;
+    margin: 10px 0;
+    word-break: break-all;
+}
+
+.kiyoh-admin-box .button {
+    margin-top: 10px;
+}
+
+#kiyoh-preview-container {
+    background: #f6f7f7;
+    border-radius: 4px;
+    padding: 15px;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#kiyoh-preview-container iframe {
+    max-width: 100%;
+    border-radius: 4px;
+}
+
+.kiyoh-preview-placeholder {
+    color: #666;
+    text-align: center;
+    font-style: italic;
+}
+
+/* Responsive */
+@media screen and (max-width: 960px) {
+    .kiyoh-admin-container {
+        flex-direction: column;
+    }
+
+    .kiyoh-admin-sidebar {
+        width: 100%;
+    }
+}
+
+/* Color picker preview */
+.kiyoh-color-preview {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    vertical-align: middle;
+    margin-left: 10px;
+}
+
+/* Toggle switches (optional enhancement) */
+.kiyoh-toggle {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.kiyoh-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.kiyoh-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.3s;
+    border-radius: 26px;
+}
+
+.kiyoh-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.kiyoh-toggle input:checked + .kiyoh-toggle-slider {
+    background-color: #ff9800;
+}
+
+.kiyoh-toggle input:checked + .kiyoh-toggle-slider:before {
+    transform: translateX(24px);
+}
+
+/* Status indicator */
+.kiyoh-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.kiyoh-status-active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.kiyoh-status-inactive {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.kiyoh-status::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.kiyoh-status-active::before {
+    background: #28a745;
+}
+
+.kiyoh-status-inactive::before {
+    background: #dc3545;
+}

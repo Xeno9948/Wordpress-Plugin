@@ -1,0 +1,258 @@
+/**
+ * Kiyoh Widget Frontend Styles
+ */
+
+/* Standard Widget Container */
+.kiyoh-widget-container {
+    display: inline-block;
+    max-width: 100%;
+}
+
+.kiyoh-widget-container iframe {
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+/* Sticky Widget */
+.kiyoh-sticky-widget {
+    position: fixed;
+    z-index: 999999;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* Horizontal Positioning */
+.kiyoh-sticky-left {
+    left: 0;
+}
+
+.kiyoh-sticky-right {
+    right: 0;
+}
+
+/* Vertical Positioning */
+.kiyoh-sticky-v-top {
+    top: 100px;
+}
+
+.kiyoh-sticky-v-middle {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.kiyoh-sticky-v-bottom {
+    bottom: 100px;
+}
+
+.kiyoh-sticky-v-middle.kiyoh-sticky-open {
+    transform: translateY(-50%);
+}
+
+/* Toggle Button */
+.kiyoh-sticky-toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 12px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    color: white;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+}
+
+.kiyoh-sticky-left .kiyoh-sticky-toggle {
+    border-radius: 0 8px 8px 0;
+}
+
+.kiyoh-sticky-right .kiyoh-sticky-toggle {
+    border-radius: 8px 0 0 8px;
+}
+
+.kiyoh-sticky-toggle:hover {
+    background: linear-gradient(135deg, #ffa726 0%, #ff9800 100%);
+    box-shadow: 0 6px 20px rgba(255, 152, 0, 0.5);
+}
+
+.kiyoh-sticky-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.kiyoh-sticky-label {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Content Panel */
+.kiyoh-sticky-content {
+    display: none;
+    position: absolute;
+    top: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    animation: kiyohSlideIn 0.3s ease;
+}
+
+.kiyoh-sticky-left .kiyoh-sticky-content {
+    left: 100%;
+    margin-left: 10px;
+}
+
+.kiyoh-sticky-right .kiyoh-sticky-content {
+    right: 100%;
+    margin-right: 10px;
+}
+
+.kiyoh-sticky-widget.kiyoh-sticky-open .kiyoh-sticky-content {
+    display: block;
+}
+
+.kiyoh-sticky-widget.kiyoh-sticky-open .kiyoh-sticky-toggle {
+    display: none;
+}
+
+/* Close Button */
+.kiyoh-sticky-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: rgba(0, 0, 0, 0.1);
+    color: #333;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.kiyoh-sticky-close:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.kiyoh-sticky-content iframe {
+    display: block;
+    border-radius: 0 0 12px 12px;
+}
+
+/* Glass Effect */
+.kiyoh-sticky-glass .kiyoh-sticky-content {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.kiyoh-sticky-glass .kiyoh-sticky-toggle {
+    background: linear-gradient(135deg, rgba(255, 152, 0, 0.9) 0%, rgba(245, 124, 0, 0.9) 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.kiyoh-sticky-glass .kiyoh-sticky-toggle:hover {
+    background: linear-gradient(135deg, rgba(255, 167, 38, 0.95) 0%, rgba(255, 152, 0, 0.95) 100%);
+}
+
+.kiyoh-sticky-glass .kiyoh-sticky-close {
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.kiyoh-sticky-glass .kiyoh-sticky-close:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Animations */
+@keyframes kiyohSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Mobile Responsive */
+@media screen and (max-width: 768px) {
+    .kiyoh-sticky-widget {
+        bottom: 20px !important;
+        top: auto !important;
+        transform: none !important;
+    }
+
+    .kiyoh-sticky-v-middle {
+        transform: none;
+    }
+
+    .kiyoh-sticky-left {
+        left: 10px;
+    }
+
+    .kiyoh-sticky-right {
+        right: 10px;
+    }
+
+    .kiyoh-sticky-toggle {
+        writing-mode: horizontal-tb;
+        flex-direction: row;
+        padding: 12px 20px;
+        border-radius: 50px !important;
+    }
+
+    .kiyoh-sticky-icon {
+        margin-bottom: 0;
+        margin-right: 8px;
+    }
+
+    .kiyoh-sticky-content {
+        position: fixed;
+        top: auto !important;
+        bottom: 80px !important;
+        left: 10px !important;
+        right: 10px !important;
+        margin: 0 !important;
+        width: auto;
+    }
+
+    .kiyoh-sticky-content iframe {
+        width: 100% !important;
+        max-width: 100%;
+    }
+}
+
+/* Print - Hide sticky widget */
+@media print {
+    .kiyoh-sticky-widget {
+        display: none !important;
+    }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .kiyoh-sticky-content {
+        animation: none;
+    }
+
+    .kiyoh-sticky-toggle,
+    .kiyoh-sticky-close {
+        transition: none;
+    }
+}
