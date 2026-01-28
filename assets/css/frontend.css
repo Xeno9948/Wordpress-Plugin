@@ -51,7 +51,7 @@
 }
 
 /* ==========================================
-   STICKY WIDGET
+   STICKY WIDGET - BASE
    ========================================== */
 
 .kiyoh-sticky-widget {
@@ -84,12 +84,12 @@
 }
 
 /* ==========================================
-   STICKY TAB (Collapsed State)
+   EXPANDABLE MODE - TAB
    ========================================== */
 
 .kiyoh-sticky-tab {
     cursor: pointer;
-    padding: 12px 8px;
+    padding: 15px 10px;
     background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
     color: white;
     box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
@@ -109,21 +109,26 @@
 
 .kiyoh-sticky-tab:hover {
     box-shadow: 0 6px 20px rgba(255, 152, 0, 0.5);
-    transform: scale(1.02);
+}
+
+.kiyoh-sticky-tab:focus {
+    outline: 2px solid #fff;
+    outline-offset: -4px;
 }
 
 .kiyoh-sticky-tab-inner {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     writing-mode: vertical-rl;
     text-orientation: mixed;
 }
 
 .kiyoh-sticky-tab-icon {
-    font-size: 22px;
-    line-height: 1;
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
 }
 
 .kiyoh-sticky-tab-text {
@@ -133,32 +138,32 @@
     text-transform: uppercase;
 }
 
-/* Hide tab when open */
+/* Hide tab when panel is open */
 .kiyoh-sticky-widget.is-open .kiyoh-sticky-tab {
     display: none;
 }
 
 /* ==========================================
-   STICKY PANEL (Expanded State)
+   EXPANDABLE MODE - PANEL
    ========================================== */
 
 .kiyoh-sticky-panel {
     display: none;
     position: absolute;
     top: 0;
-    padding: 15px;
-    padding-top: 40px;
+    padding: 20px;
+    padding-top: 45px;
     border-radius: 16px;
-    background: #ffc857;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(145deg, #ffc857 0%, #ffb830 100%);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
 }
 
 .kiyoh-sticky-widget.is-open .kiyoh-sticky-panel {
     display: block;
-    animation: kiyohFadeIn 0.3s ease;
+    animation: kiyohSlideIn 0.3s ease;
 }
 
-/* Panel position based on widget position */
+/* Panel positioning */
 .kiyoh-sticky-left .kiyoh-sticky-panel {
     left: 10px;
 }
@@ -171,25 +176,66 @@
 .kiyoh-sticky-panel-content {
     border-radius: 12px;
     overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .kiyoh-sticky-panel-content iframe {
     display: block;
-    border-radius: 12px;
 }
 
-/* Close button */
+/* ==========================================
+   BADGE MODE (Always Visible)
+   ========================================== */
+
+.kiyoh-sticky-badge-mode .kiyoh-sticky-badge {
+    padding: 20px;
+    padding-top: 45px;
+    border-radius: 16px;
+    background: linear-gradient(145deg, #ffc857 0%, #ffb830 100%);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+    animation: kiyohSlideIn 0.5s ease;
+}
+
+.kiyoh-sticky-left .kiyoh-sticky-badge {
+    border-radius: 0 16px 16px 0;
+}
+
+.kiyoh-sticky-right .kiyoh-sticky-badge {
+    border-radius: 16px 0 0 16px;
+}
+
+.kiyoh-sticky-badge-content {
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.kiyoh-sticky-badge-content iframe {
+    display: block;
+}
+
+/* Hide badge when dismissed */
+.kiyoh-sticky-badge-mode.is-hidden .kiyoh-sticky-badge {
+    display: none;
+}
+
+/* ==========================================
+   CLOSE BUTTON
+   ========================================== */
+
 .kiyoh-sticky-close {
     position: absolute;
     top: 10px;
     right: 10px;
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border: none;
     background: rgba(0, 0, 0, 0.15);
     color: #333;
-    font-size: 20px;
-    line-height: 26px;
+    font-size: 22px;
+    line-height: 1;
     text-align: center;
     cursor: pointer;
     border-radius: 50%;
@@ -204,52 +250,80 @@
     background: rgba(0, 0, 0, 0.25);
 }
 
+.kiyoh-sticky-close:focus {
+    outline: 2px solid #333;
+    outline-offset: 2px;
+}
+
 /* ==========================================
    PANEL STYLES
    ========================================== */
 
 /* Glass/Frosted Effect */
-.kiyoh-sticky-style-glass .kiyoh-sticky-panel {
-    background: linear-gradient(145deg, rgba(255, 200, 87, 0.95) 0%, rgba(255, 180, 50, 0.9) 100%);
+.kiyoh-sticky-style-glass .kiyoh-sticky-panel,
+.kiyoh-sticky-style-glass .kiyoh-sticky-badge {
+    background: linear-gradient(145deg, rgba(255, 200, 87, 0.95) 0%, rgba(255, 184, 48, 0.9) 100%);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .kiyoh-sticky-style-glass .kiyoh-sticky-close {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
 }
 
 .kiyoh-sticky-style-glass .kiyoh-sticky-close:hover {
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.6);
 }
 
 /* Solid Style */
-.kiyoh-sticky-style-solid .kiyoh-sticky-panel {
+.kiyoh-sticky-style-solid .kiyoh-sticky-panel,
+.kiyoh-sticky-style-solid .kiyoh-sticky-badge {
     background: #ffc857;
     border: none;
 }
 
 /* Shadow Style */
-.kiyoh-sticky-style-shadow .kiyoh-sticky-panel {
-    background: #fff;
+.kiyoh-sticky-style-shadow .kiyoh-sticky-panel,
+.kiyoh-sticky-style-shadow .kiyoh-sticky-badge {
+    background: #ffffff;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.kiyoh-sticky-style-shadow .kiyoh-sticky-close {
+    background: rgba(0, 0, 0, 0.08);
 }
 
 /* ==========================================
    ANIMATIONS
    ========================================== */
 
-@keyframes kiyohFadeIn {
+@keyframes kiyohSlideIn {
     from {
         opacity: 0;
-        transform: scale(0.95);
+        transform: scale(0.9) translateX(20px);
     }
     to {
         opacity: 1;
-        transform: scale(1);
+        transform: scale(1) translateX(0);
+    }
+}
+
+.kiyoh-sticky-left .kiyoh-sticky-panel,
+.kiyoh-sticky-left .kiyoh-sticky-badge {
+    animation-name: kiyohSlideInLeft;
+}
+
+@keyframes kiyohSlideInLeft {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateX(0);
     }
 }
 
@@ -278,13 +352,13 @@
 
     /* Horizontal tab on mobile */
     .kiyoh-sticky-tab {
-        padding: 10px 16px;
+        padding: 12px 18px;
     }
 
     .kiyoh-sticky-tab-inner {
         writing-mode: horizontal-tb;
         flex-direction: row;
-        gap: 8px;
+        gap: 10px;
     }
 
     .kiyoh-sticky-left .kiyoh-sticky-tab {
@@ -296,16 +370,19 @@
     }
 
     /* Full-width panel on mobile */
-    .kiyoh-sticky-panel {
+    .kiyoh-sticky-panel,
+    .kiyoh-sticky-badge {
         position: fixed;
         top: auto !important;
-        bottom: 70px !important;
+        bottom: 80px !important;
         left: 10px !important;
         right: 10px !important;
         width: auto;
+        border-radius: 16px !important;
     }
 
-    .kiyoh-sticky-panel-content iframe {
+    .kiyoh-sticky-panel-content iframe,
+    .kiyoh-sticky-badge-content iframe {
         width: 100% !important;
         max-width: 100%;
     }
@@ -326,7 +403,8 @@
    ========================================== */
 
 @media (prefers-reduced-motion: reduce) {
-    .kiyoh-sticky-widget.is-open .kiyoh-sticky-panel {
+    .kiyoh-sticky-widget.is-open .kiyoh-sticky-panel,
+    .kiyoh-sticky-badge-mode .kiyoh-sticky-badge {
         animation: none;
     }
 

@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('KIYOH_WIDGET_VERSION', '1.1.0');
+define('KIYOH_WIDGET_VERSION', '1.2.0');
 define('KIYOH_WIDGET_PATH', plugin_dir_path(__FILE__));
 define('KIYOH_WIDGET_URL', plugin_dir_url(__FILE__));
 
@@ -45,6 +45,7 @@ class Kiyoh_Widget {
         'standard_alignment' => 'center',
         // Sticky widget settings
         'sticky_enabled' => 'off',
+        'sticky_mode' => 'expandable',
         'sticky_position' => 'right',
         'sticky_vertical' => 'middle',
         'sticky_style' => 'glass',
@@ -121,6 +122,7 @@ class Kiyoh_Widget {
 
         // Sticky widget
         $sanitized['sticky_enabled'] = in_array($input['sticky_enabled'] ?? 'off', array('on', 'off')) ? $input['sticky_enabled'] : 'off';
+        $sanitized['sticky_mode'] = in_array($input['sticky_mode'] ?? 'expandable', array('expandable', 'badge')) ? $input['sticky_mode'] : 'expandable';
         $sanitized['sticky_position'] = in_array($input['sticky_position'] ?? 'right', array('left', 'right')) ? $input['sticky_position'] : 'right';
         $sanitized['sticky_vertical'] = in_array($input['sticky_vertical'] ?? 'middle', array('top', 'middle', 'bottom')) ? $input['sticky_vertical'] : 'middle';
         $sanitized['sticky_style'] = in_array($input['sticky_style'] ?? 'glass', array('glass', 'solid', 'shadow')) ? $input['sticky_style'] : 'glass';
@@ -328,30 +330,62 @@ class Kiyoh_Widget {
             return;
         }
 
-        $widget_html = $this->get_widget_html($options);
+        $iframe_url = $this->build_iframe_url($options);
+        $is_badge_mode = ($options['sticky_mode'] === 'badge');
 
         $classes = array('kiyoh-sticky-widget');
         $classes[] = 'kiyoh-sticky-' . $options['sticky_position'];
         $classes[] = 'kiyoh-sticky-v-' . $options['sticky_vertical'];
         $classes[] = 'kiyoh-sticky-style-' . $options['sticky_style'];
+        if ($is_badge_mode) {
+            $classes[] = 'kiyoh-sticky-badge-mode';
+        }
+
+        // Kiyoh teller icon SVG
+        $kiyoh_icon = '<svg class="kiyoh-sticky-tab-icon" viewBox="0 0 50 50" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M25 0C11.2 0 0 11.2 0 25s11.2 25 25 25 25-11.2 25-25S38.8 0 25 0zm0 45.5C13.5 45.5 4.5 36.5 4.5 25S13.5 4.5 25 4.5 45.5 13.5 45.5 25 36.5 45.5 25 45.5z"/><path d="M25 8.5c-9.1 0-16.5 7.4-16.5 16.5S15.9 41.5 25 41.5 41.5 34.1 41.5 25 34.1 8.5 25 8.5zm0 28c-6.4 0-11.5-5.1-11.5-11.5S18.6 13.5 25 13.5 36.5 18.6 36.5 25 31.4 36.5 25 36.5z"/><circle cx="25" cy="25" r="6"/></svg>';
 
         ?>
-        <div id="kiyoh-sticky-widget" class="<?php echo esc_attr(implode(' ', $classes)); ?>">
-            <!-- Collapsed Tab -->
-            <div class="kiyoh-sticky-tab" role="button" tabindex="0" aria-label="<?php esc_attr_e('Open reviews', 'kiyoh-widget'); ?>">
-                <div class="kiyoh-sticky-tab-inner">
-                    <span class="kiyoh-sticky-tab-icon">&#9733;</span>
-                    <span class="kiyoh-sticky-tab-text"><?php esc_html_e('Reviews', 'kiyoh-widget'); ?></span>
+        <div id="kiyoh-sticky-widget" class="<?php echo esc_attr(implode(' ', $classes)); ?>" data-mode="<?php echo esc_attr($options['sticky_mode']); ?>">
+            <?php if ($is_badge_mode): ?>
+                <!-- Badge Mode: Always visible widget -->
+                <div class="kiyoh-sticky-badge">
+                    <button type="button" class="kiyoh-sticky-close" aria-label="<?php esc_attr_e('Close', 'kiyoh-widget'); ?>">&times;</button>
+                    <div class="kiyoh-sticky-badge-content">
+                        <iframe
+                            frameborder="0"
+                            allowtransparency="<?php echo $options['transparent'] === 'on' ? 'true' : 'false'; ?>"
+                            src="<?php echo esc_url($iframe_url); ?>"
+                            width="<?php echo absint($options['width']); ?>"
+                            height="<?php echo absint($options['height']); ?>"
+                            title="<?php esc_attr_e('Kiyoh Reviews', 'kiyoh-widget'); ?>"
+                            style="border:none; border-radius: 12px;">
+                        </iframe>
+                    </div>
                 </div>
-            </div>
+            <?php else: ?>
+                <!-- Expandable Mode: Tab + Panel -->
+                <div class="kiyoh-sticky-tab" role="button" tabindex="0" aria-label="<?php esc_attr_e('Open reviews', 'kiyoh-widget'); ?>">
+                    <div class="kiyoh-sticky-tab-inner">
+                        <?php echo $kiyoh_icon; ?>
+                        <span class="kiyoh-sticky-tab-text"><?php esc_html_e('Reviews', 'kiyoh-widget'); ?></span>
+                    </div>
+                </div>
 
-            <!-- Expanded Panel -->
-            <div class="kiyoh-sticky-panel" aria-hidden="true">
-                <button type="button" class="kiyoh-sticky-close" aria-label="<?php esc_attr_e('Close', 'kiyoh-widget'); ?>">&times;</button>
-                <div class="kiyoh-sticky-panel-content">
-                    <?php echo $widget_html; ?>
+                <div class="kiyoh-sticky-panel" aria-hidden="true">
+                    <button type="button" class="kiyoh-sticky-close" aria-label="<?php esc_attr_e('Close', 'kiyoh-widget'); ?>">&times;</button>
+                    <div class="kiyoh-sticky-panel-content">
+                        <iframe
+                            frameborder="0"
+                            allowtransparency="<?php echo $options['transparent'] === 'on' ? 'true' : 'false'; ?>"
+                            src="<?php echo esc_url($iframe_url); ?>"
+                            width="<?php echo absint($options['width']); ?>"
+                            height="<?php echo absint($options['height']); ?>"
+                            title="<?php esc_attr_e('Kiyoh Reviews', 'kiyoh-widget'); ?>"
+                            style="border:none; border-radius: 12px;">
+                        </iframe>
+                    </div>
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
         <?php
     }
@@ -503,6 +537,16 @@ class Kiyoh_Widget {
                                     <td>
                                         <label><input type="radio" name="kiyoh_widget_options[sticky_enabled]" value="on" <?php checked($options['sticky_enabled'], 'on'); ?>> <?php esc_html_e('Yes', 'kiyoh-widget'); ?></label>
                                         <label><input type="radio" name="kiyoh_widget_options[sticky_enabled]" value="off" <?php checked($options['sticky_enabled'], 'off'); ?>> <?php esc_html_e('No', 'kiyoh-widget'); ?></label>
+                                    </td>
+                                </tr>
+                                <tr class="kiyoh-sticky-options">
+                                    <th scope="row"><label for="sticky_mode"><?php esc_html_e('Display Mode', 'kiyoh-widget'); ?></label></th>
+                                    <td>
+                                        <select id="sticky_mode" name="kiyoh_widget_options[sticky_mode]">
+                                            <option value="expandable" <?php selected($options['sticky_mode'], 'expandable'); ?>><?php esc_html_e('Expandable Tab (click to open)', 'kiyoh-widget'); ?></option>
+                                            <option value="badge" <?php selected($options['sticky_mode'], 'badge'); ?>><?php esc_html_e('Badge (always visible)', 'kiyoh-widget'); ?></option>
+                                        </select>
+                                        <p class="description"><?php esc_html_e('Expandable shows a tab that opens on click. Badge shows the full widget always.', 'kiyoh-widget'); ?></p>
                                     </td>
                                 </tr>
                                 <tr class="kiyoh-sticky-options">

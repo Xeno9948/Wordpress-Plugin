@@ -6,7 +6,6 @@
 (function() {
     'use strict';
 
-    // Wait for DOM ready
     function ready(fn) {
         if (document.readyState !== 'loading') {
             fn();
@@ -22,37 +21,80 @@
             return;
         }
 
+        var mode = widget.getAttribute('data-mode') || 'expandable';
+        var closeBtn = widget.querySelector('.kiyoh-sticky-close');
+
+        // Handle badge mode (always visible with dismiss option)
+        if (mode === 'badge') {
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    widget.classList.add('is-hidden');
+
+                    // Store dismissal in session storage
+                    try {
+                        sessionStorage.setItem('kiyoh_widget_dismissed', '1');
+                    } catch (err) {
+                        // Session storage not available
+                    }
+
+                    document.dispatchEvent(new CustomEvent('kiyoh:widget:dismissed'));
+                });
+            }
+
+            // Check if previously dismissed this session
+            try {
+                if (sessionStorage.getItem('kiyoh_widget_dismissed') === '1') {
+                    widget.classList.add('is-hidden');
+                }
+            } catch (err) {
+                // Session storage not available
+            }
+
+            // Expose API
+            window.KiyohWidget = {
+                show: function() {
+                    widget.classList.remove('is-hidden');
+                    try {
+                        sessionStorage.removeItem('kiyoh_widget_dismissed');
+                    } catch (err) {}
+                },
+                hide: function() {
+                    widget.classList.add('is-hidden');
+                },
+                isVisible: function() {
+                    return !widget.classList.contains('is-hidden');
+                }
+            };
+
+            return;
+        }
+
+        // Handle expandable mode
         var tab = widget.querySelector('.kiyoh-sticky-tab');
         var panel = widget.querySelector('.kiyoh-sticky-panel');
-        var closeBtn = widget.querySelector('.kiyoh-sticky-close');
 
         if (!tab || !panel || !closeBtn) {
             return;
         }
 
-        // Open widget
         function openWidget() {
             widget.classList.add('is-open');
             panel.setAttribute('aria-hidden', 'false');
             tab.setAttribute('aria-expanded', 'true');
             closeBtn.focus();
-
-            // Dispatch custom event
             document.dispatchEvent(new CustomEvent('kiyoh:widget:opened'));
         }
 
-        // Close widget
         function closeWidget() {
             widget.classList.remove('is-open');
             panel.setAttribute('aria-hidden', 'true');
             tab.setAttribute('aria-expanded', 'false');
             tab.focus();
-
-            // Dispatch custom event
             document.dispatchEvent(new CustomEvent('kiyoh:widget:closed'));
         }
 
-        // Toggle widget
         function toggleWidget() {
             if (widget.classList.contains('is-open')) {
                 closeWidget();
@@ -61,14 +103,14 @@
             }
         }
 
-        // Tab click handler
+        // Tab click
         tab.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             openWidget();
         });
 
-        // Tab keyboard handler
+        // Tab keyboard
         tab.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -76,21 +118,21 @@
             }
         });
 
-        // Close button handler
+        // Close button
         closeBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             closeWidget();
         });
 
-        // Close on Escape key
+        // Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && widget.classList.contains('is-open')) {
                 closeWidget();
             }
         });
 
-        // Close when clicking outside
+        // Click outside
         document.addEventListener('click', function(e) {
             if (widget.classList.contains('is-open')) {
                 if (!widget.contains(e.target)) {
@@ -121,7 +163,6 @@
             var deltaX = touchEndX - touchStartX;
             var deltaY = Math.abs(touchEndY - touchStartY);
 
-            // Only handle horizontal swipes
             if (deltaY > Math.abs(deltaX)) {
                 return;
             }
@@ -130,14 +171,12 @@
             var isOpen = widget.classList.contains('is-open');
 
             if (isOpen) {
-                // Swipe to close
                 if (isLeftPosition && deltaX < -swipeThreshold) {
                     closeWidget();
                 } else if (!isLeftPosition && deltaX > swipeThreshold) {
                     closeWidget();
                 }
             } else {
-                // Swipe to open
                 if (isLeftPosition && deltaX > swipeThreshold) {
                     openWidget();
                 } else if (!isLeftPosition && deltaX < -swipeThreshold) {
@@ -146,13 +185,13 @@
             }
         }
 
-        // Set initial ARIA attributes
+        // Initial ARIA attributes
         panel.setAttribute('aria-hidden', 'true');
         tab.setAttribute('aria-expanded', 'false');
         tab.setAttribute('role', 'button');
         tab.setAttribute('tabindex', '0');
 
-        // Expose API for external use
+        // Expose API
         window.KiyohWidget = {
             open: openWidget,
             close: closeWidget,
