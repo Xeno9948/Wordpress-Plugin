@@ -6,6 +6,11 @@
     'use strict';
 
     $(document).ready(function() {
+        // Initialize color picker
+        if ($.fn.wpColorPicker) {
+            $('.kiyoh-color-picker').wpColorPicker();
+        }
+
         // Live preview update
         var previewTimeout;
 
@@ -22,10 +27,10 @@
 
             var color = $('#color').val();
             var language = $('#language').val();
-            var border = $('input[name="kiyoh_widget_options[border]"]:checked').val();
             var transparent = $('input[name="kiyoh_widget_options[transparent]"]:checked').val();
             var button = $('input[name="kiyoh_widget_options[button]"]:checked').val();
             var height = $('#height').val() || 222;
+            var width = $('#width').val() || 400;
 
             var params = {
                 color: color,
@@ -37,15 +42,14 @@
             };
 
             var url = 'https://www.kiyoh.com/retrieve-widget.html?' + $.param(params);
-            var frameborder = border === 'on' ? '1' : '0';
-            var allowTransparency = transparent === 'on' ? 'true' : 'false';
 
             var iframe = '<iframe ' +
-                'frameborder="' + frameborder + '" ' +
-                'allowtransparency="' + allowTransparency + '" ' +
+                'frameborder="0" ' +
+                'allowtransparency="' + (transparent === 'on' ? 'true' : 'false') + '" ' +
                 'src="' + url + '" ' +
                 'width="100%" ' +
                 'height="' + height + '" ' +
+                'style="border:none; border-radius: 12px;" ' +
                 'title="Kiyoh Reviews Preview">' +
                 '</iframe>';
 
@@ -58,27 +62,35 @@
             previewTimeout = setTimeout(updatePreview, 500);
         }
 
-        // Bind change events
+        // Bind change events for preview
         $('#tenant_id, #location_id, #color, #language, #width, #height').on('input change', schedulePreviewUpdate);
-        $('input[name="kiyoh_widget_options[border]"], input[name="kiyoh_widget_options[transparent]"], input[name="kiyoh_widget_options[button]"]').on('change', schedulePreviewUpdate);
+        $('input[name="kiyoh_widget_options[transparent]"], input[name="kiyoh_widget_options[button]"]').on('change', schedulePreviewUpdate);
 
-        // Sticky widget toggle visibility
-        function toggleStickyOptions() {
-            var stickyEnabled = $('input[name="kiyoh_widget_options[sticky_enabled]"]:checked').val();
-            var $stickyOptions = $('input[name="kiyoh_widget_options[sticky_position]"], input[name="kiyoh_widget_options[sticky_vertical]"], input[name="kiyoh_widget_options[sticky_glass]"]').closest('tr');
-            var $stickySelects = $('#sticky_position, #sticky_vertical').closest('tr');
-
-            if (stickyEnabled === 'on') {
-                $stickyOptions.show();
-                $stickySelects.show();
+        // Toggle standard widget options visibility
+        function toggleStandardOptions() {
+            var enabled = $('input[name="kiyoh_widget_options[standard_enabled]"]:checked').val();
+            if (enabled === 'on') {
+                $('.kiyoh-standard-options').show();
             } else {
-                $stickyOptions.hide();
-                $stickySelects.hide();
+                $('.kiyoh-standard-options').hide();
+            }
+        }
+
+        $('input[name="kiyoh_widget_options[standard_enabled]"]').on('change', toggleStandardOptions);
+        toggleStandardOptions();
+
+        // Toggle sticky widget options visibility
+        function toggleStickyOptions() {
+            var enabled = $('input[name="kiyoh_widget_options[sticky_enabled]"]:checked').val();
+            if (enabled === 'on') {
+                $('.kiyoh-sticky-options').show();
+            } else {
+                $('.kiyoh-sticky-options').hide();
             }
         }
 
         $('input[name="kiyoh_widget_options[sticky_enabled]"]').on('change', toggleStickyOptions);
-        toggleStickyOptions(); // Initial state
+        toggleStickyOptions();
 
         // Copy shortcode to clipboard
         $('.kiyoh-admin-box code').on('click', function() {
@@ -90,7 +102,7 @@
                     showCopyFeedback($this);
                 });
             } else {
-                // Fallback for older browsers
+                // Fallback
                 var $temp = $('<textarea>');
                 $('body').append($temp);
                 $temp.val(text).select();
@@ -108,23 +120,23 @@
             }, 500);
         }
 
+        // Add cursor pointer to copyable codes
+        $('.kiyoh-admin-box code').css('cursor', 'pointer').attr('title', 'Click to copy');
+
         // Form validation
         $('form').on('submit', function(e) {
             var tenantId = $('#tenant_id').val();
             var locationId = $('#location_id').val();
             var stickyEnabled = $('input[name="kiyoh_widget_options[sticky_enabled]"]:checked').val();
+            var standardEnabled = $('input[name="kiyoh_widget_options[standard_enabled]"]:checked').val();
 
-            // Warn if sticky is enabled but no IDs
-            if (stickyEnabled === 'on' && (!tenantId || !locationId)) {
-                if (!confirm('Sticky widget is enabled but Tenant ID or Location ID is missing. The widget will not display until these are configured. Continue saving?')) {
+            if ((stickyEnabled === 'on' || standardEnabled === 'on') && (!tenantId || !locationId)) {
+                if (!confirm('Widget is enabled but Tenant ID or Location ID is missing. The widget will not display until these are configured. Continue saving?')) {
                     e.preventDefault();
                     return false;
                 }
             }
         });
-
-        // Add cursor pointer to copyable codes
-        $('.kiyoh-admin-box code').css('cursor', 'pointer').attr('title', 'Click to copy');
     });
 
 })(jQuery);

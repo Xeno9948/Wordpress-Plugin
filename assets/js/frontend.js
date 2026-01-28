@@ -1,159 +1,166 @@
 /**
  * Kiyoh Widget Frontend JavaScript
+ * Handles sticky widget open/close functionality
  */
 
-(function($) {
+(function() {
     'use strict';
 
-    $(document).ready(function() {
-        var $stickyWidget = $('#kiyoh-sticky-widget');
+    // Wait for DOM ready
+    function ready(fn) {
+        if (document.readyState !== 'loading') {
+            fn();
+        } else {
+            document.addEventListener('DOMContentLoaded', fn);
+        }
+    }
 
-        if (!$stickyWidget.length) {
+    ready(function() {
+        var widget = document.getElementById('kiyoh-sticky-widget');
+
+        if (!widget) {
             return;
         }
 
-        var $toggle = $stickyWidget.find('.kiyoh-sticky-toggle');
-        var $content = $stickyWidget.find('.kiyoh-sticky-content');
-        var $close = $stickyWidget.find('.kiyoh-sticky-close');
+        var tab = widget.querySelector('.kiyoh-sticky-tab');
+        var panel = widget.querySelector('.kiyoh-sticky-panel');
+        var closeBtn = widget.querySelector('.kiyoh-sticky-close');
+
+        if (!tab || !panel || !closeBtn) {
+            return;
+        }
 
         // Open widget
-        $toggle.on('click', function(e) {
+        function openWidget() {
+            widget.classList.add('is-open');
+            panel.setAttribute('aria-hidden', 'false');
+            tab.setAttribute('aria-expanded', 'true');
+            closeBtn.focus();
+
+            // Dispatch custom event
+            document.dispatchEvent(new CustomEvent('kiyoh:widget:opened'));
+        }
+
+        // Close widget
+        function closeWidget() {
+            widget.classList.remove('is-open');
+            panel.setAttribute('aria-hidden', 'true');
+            tab.setAttribute('aria-expanded', 'false');
+            tab.focus();
+
+            // Dispatch custom event
+            document.dispatchEvent(new CustomEvent('kiyoh:widget:closed'));
+        }
+
+        // Toggle widget
+        function toggleWidget() {
+            if (widget.classList.contains('is-open')) {
+                closeWidget();
+            } else {
+                openWidget();
+            }
+        }
+
+        // Tab click handler
+        tab.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             openWidget();
         });
 
-        // Close widget
-        $close.on('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            closeWidget();
-        });
-
-        // Close on escape key
-        $(document).on('keydown', function(e) {
-            if (e.key === 'Escape' && $stickyWidget.hasClass('kiyoh-sticky-open')) {
-                closeWidget();
-            }
-        });
-
-        // Close when clicking outside
-        $(document).on('click', function(e) {
-            if ($stickyWidget.hasClass('kiyoh-sticky-open')) {
-                if (!$(e.target).closest('#kiyoh-sticky-widget').length) {
-                    closeWidget();
-                }
-            }
-        });
-
-        function openWidget() {
-            $stickyWidget.addClass('kiyoh-sticky-open');
-            $content.attr('aria-hidden', 'false');
-            $close.focus();
-
-            // Trigger custom event
-            $(document).trigger('kiyoh:widget:opened');
-        }
-
-        function closeWidget() {
-            $stickyWidget.removeClass('kiyoh-sticky-open');
-            $content.attr('aria-hidden', 'true');
-            $toggle.focus();
-
-            // Trigger custom event
-            $(document).trigger('kiyoh:widget:closed');
-        }
-
-        // Touch support for mobile
-        var touchStartX = 0;
-        var touchEndX = 0;
-
-        $stickyWidget.on('touchstart', function(e) {
-            touchStartX = e.changedTouches[0].screenX;
-        });
-
-        $stickyWidget.on('touchend', function(e) {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        });
-
-        function handleSwipe() {
-            var swipeThreshold = 50;
-            var isLeftPosition = $stickyWidget.hasClass('kiyoh-sticky-left');
-
-            if ($stickyWidget.hasClass('kiyoh-sticky-open')) {
-                // Swipe to close
-                if (isLeftPosition && touchEndX < touchStartX - swipeThreshold) {
-                    closeWidget();
-                } else if (!isLeftPosition && touchEndX > touchStartX + swipeThreshold) {
-                    closeWidget();
-                }
-            } else {
-                // Swipe to open
-                if (isLeftPosition && touchEndX > touchStartX + swipeThreshold) {
-                    openWidget();
-                } else if (!isLeftPosition && touchEndX < touchStartX - swipeThreshold) {
-                    openWidget();
-                }
-            }
-        }
-
-        // Lazy load iframe on first open
-        var iframeLoaded = false;
-        var $iframe = $content.find('iframe');
-        var iframeSrc = $iframe.attr('src');
-
-        // If we want lazy loading, uncomment this:
-        // $iframe.removeAttr('src');
-        //
-        // $toggle.one('click', function() {
-        //     if (!iframeLoaded) {
-        //         $iframe.attr('src', iframeSrc);
-        //         iframeLoaded = true;
-        //     }
-        // });
-
-        // Accessibility: Set initial aria states
-        $content.attr('aria-hidden', 'true');
-        $toggle.attr({
-            'role': 'button',
-            'aria-expanded': 'false',
-            'aria-controls': 'kiyoh-sticky-content',
-            'tabindex': '0'
-        });
-
-        // Keyboard support for toggle
-        $toggle.on('keydown', function(e) {
+        // Tab keyboard handler
+        tab.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 openWidget();
             }
         });
 
-        // Update aria-expanded when state changes
-        $(document).on('kiyoh:widget:opened', function() {
-            $toggle.attr('aria-expanded', 'true');
+        // Close button handler
+        closeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeWidget();
         });
 
-        $(document).on('kiyoh:widget:closed', function() {
-            $toggle.attr('aria-expanded', 'false');
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && widget.classList.contains('is-open')) {
+                closeWidget();
+            }
         });
+
+        // Close when clicking outside
+        document.addEventListener('click', function(e) {
+            if (widget.classList.contains('is-open')) {
+                if (!widget.contains(e.target)) {
+                    closeWidget();
+                }
+            }
+        });
+
+        // Touch swipe support
+        var touchStartX = 0;
+        var touchEndX = 0;
+        var touchStartY = 0;
+        var touchEndY = 0;
+
+        widget.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+
+        widget.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            var swipeThreshold = 50;
+            var deltaX = touchEndX - touchStartX;
+            var deltaY = Math.abs(touchEndY - touchStartY);
+
+            // Only handle horizontal swipes
+            if (deltaY > Math.abs(deltaX)) {
+                return;
+            }
+
+            var isLeftPosition = widget.classList.contains('kiyoh-sticky-left');
+            var isOpen = widget.classList.contains('is-open');
+
+            if (isOpen) {
+                // Swipe to close
+                if (isLeftPosition && deltaX < -swipeThreshold) {
+                    closeWidget();
+                } else if (!isLeftPosition && deltaX > swipeThreshold) {
+                    closeWidget();
+                }
+            } else {
+                // Swipe to open
+                if (isLeftPosition && deltaX > swipeThreshold) {
+                    openWidget();
+                } else if (!isLeftPosition && deltaX < -swipeThreshold) {
+                    openWidget();
+                }
+            }
+        }
+
+        // Set initial ARIA attributes
+        panel.setAttribute('aria-hidden', 'true');
+        tab.setAttribute('aria-expanded', 'false');
+        tab.setAttribute('role', 'button');
+        tab.setAttribute('tabindex', '0');
 
         // Expose API for external use
         window.KiyohWidget = {
             open: openWidget,
             close: closeWidget,
-            toggle: function() {
-                if ($stickyWidget.hasClass('kiyoh-sticky-open')) {
-                    closeWidget();
-                } else {
-                    openWidget();
-                }
-            },
+            toggle: toggleWidget,
             isOpen: function() {
-                return $stickyWidget.hasClass('kiyoh-sticky-open');
+                return widget.classList.contains('is-open');
             }
         };
     });
 
-})(jQuery);
+})();
